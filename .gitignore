@@ -1,0 +1,34 @@
+<<<<<<< HEAD
+__pycache__/
+*.pyc
+*.log
+*.spec
+build/
+dist/
+.venv/
+.idea/
+.vscode/
+=======
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite Database
+*.db
+*.sqlite3
+
+# Exported data
+export_data.csv
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE files
+.vscode/
+.idea/
+>>>>>>> 80c8985 (Hoan thanh project Real-time Currency Tracker Pro)
