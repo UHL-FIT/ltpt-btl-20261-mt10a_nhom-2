@@ -1,53 +1,45 @@
-# Software Architecture Document (SAD) - SmartAttend
-
-## 1. Giới thiệu
-Tài liệu này cung cấp một cái nhìn tổng quan về kiến trúc phần mềm của ứng dụng SmartAttend. Nó phác thảo các quyết định kiến trúc, mô hình tổ chức source code và luồng dữ liệu của hệ thống.
-
----
-
-## 2. Kiến trúc Tổng thể (Architectural Pattern)
-SmartAttend được xây dựng hoàn toàn dựa trên kiến trúc **MVC (Model - View - Controller)** kết hợp với mô hình ứng dụng phân lớp đơn giản dành cho Desktop.
-Điều này giúp tách biệt rõ ràng giữa logic dữ liệu, giao diện hiển thị và bộ điều phối:
-* **Model**: Chịu trách nhiệm trực tiếp giao tiếp với Data Source (lưu trữ dưới dạng file **CSV**) và bắt buộc sử dụng thư viện **Numpy/Pandas** để xử lý tính toán số liệu nặng.
-* **View**: Giao diện hiển thị với người dùng xây dựng bằng **Tkinter**. Ứng dụng bao gồm tối thiểu **03 windows** (01 Main window chứa bảng dữ liệu, tìm kiếm, các label thống kê, và 02 Sub windows dạng popup dùng để Thêm và Sửa thông tin). View hỗ trợ auto resize/align, tuỳ chỉnh màu sắc và icon.
-* **Controller**: Viết bằng **Python cơ bản**, đóng vai trò điều phối. Nó nhận hành động từ View, thực hiện **Input validation** (kiểm tra rỗng, sai kiểu dữ liệu, chọn nhiều dòng - và hiển thị messagebox cảnh báo), gọi Model xử lý, sau đó trả kết quả về View để render lại UI.
+# TÀI LIỆU THIẾT KẾ KIẾN TRÚC PHẦN MỀM (SAD)
+**Dự án:** Real-time Currency Tracker Pro  
+**Nhóm thực hiện:** Nhóm 2  
 
 ---
 
-## 3. Cấu trúc Source Code
+## 1. Mẫu Kiến trúc Hệ thống (Architectural Pattern)
+Hệ thống được thiết kế hoàn toàn theo mẫu kiến trúc **MVC (Model-View-Controller)**. 
+Mẫu kiến trúc này giúp phân tách rạch ròi giữa giao diện người dùng, logic nghiệp vụ, và lưu trữ dữ liệu, đáp ứng tốt cho một ứng dụng có giao diện Desktop đồ họa phức tạp.
 
-```text
-ltpt_example/
-├── data/
-│   └── diemdanh.csv            # Data Source: Lưu trữ dữ liệu dạng bảng.
-├── models/
-│   └── diemdanh.py             # Layer Model: Thực hiện các nghiệp vụ CRUD, dùng Vectorization để tính toán chuyên cần.
-├── views/
-│   ├── gui_view.py             # Layer View (Đồ hoạ): Sử dụng Tkinter cơ bản, Treeview hiển thị dữ liệu.
-│   └── cli_view.py             # Layer View (Dòng lệnh): Sử dụng Colorama, In bảng dữ liệu ra terminal.
-├── controllers/
-│   ├── gui_controller.py       # Layer Controller (Cho GUI): Bắt sự kiện click chuột, gọi models và render lại UI.
-│   └── cli_controller.py       # Layer Controller (Cho CLI): Phân tích lệnh arg, gọi models và in kết quả.
-├── utils/
-│   └── logger.py               # Utility: Hỗ trợ ghi log các hoạt động (Debug, Info, Error).
-└── main.py                     # Entry Point: File khởi chạy ứng dụng. Cấu hình chọn chạy chế độ GUI hay CLI.
-```
+## 2. Thiết kế Các Thành Phần (Component Design)
 
----
+### 2.1. Lớp Model (`models/`)
+* **Vai trò:** Quản lý toàn bộ cấu trúc dữ liệu và tương tác trực tiếp với cơ sở dữ liệu SQLite.
+* **Component chính:** `Database` (`database.py`)
+  * Quản lý hai bảng `pairs` (Danh sách cặp tiền) và `history` (Lịch sử tỷ giá).
+  * Trích xuất dữ liệu thô từ SQLite, load vào `pandas.DataFrame` để xử lý và tính toán thống kê (Mean, Min, Max, Standard Deviation cho Volatility).
+  * Xử lý thao tác Import/Export CSV.
 
-## 4. Công nghệ sử dụng
-* **Ngôn ngữ lõi**: Python 3.9+
-* **Xử lý Dữ liệu**: `pandas` (Quản lý dataframe, import/export csv) và `numpy` (Tính toán mảng lớn nhanh chóng, thay thế cho vòng lặp thông thường).
-* **Giao diện (GUI)**: Thư viện chuẩn `tkinter` (Giao diện cơ bản, dễ hiểu, phù hợp cho sinh viên học tập). Sử dụng các widget cơ bản: button (kèm icon), edit text, label text, table (Treeview). Đảm bảo bố cục hài hoà và có khả năng auto resize.
-* **Giao diện (CLI)**: Thư viện chuẩn `argparse` và thư viện `colorama` để in text có màu.
-* **Đóng gói**: `pyinstaller` dùng để chuyển file Python script thành file thực thi `.exe` độc lập trên Windows.
-* **Kiểm thử**: Sử dụng thư viện `unittest` tiêu chuẩn của Python.
+### 2.2. Lớp View (`views/`)
+* **Vai trò:** Xây dựng Giao diện người dùng (GUI) và thu thập thao tác của người dùng. Không chứa logic truy xuất database.
+* **Component chính:**
+  * `MainWindow` (`main_gui.py`): Màn hình chính sử dụng `customtkinter` và `tkinter.ttk.Treeview`. Hiển thị bảng tổng hợp tỷ giá và thẻ thống kê.
+  * `components.py`: Chứa các thành phần UI mở rộng:
+    * `SplashScreen`: Màn hình chờ tải dữ liệu.
+    * `AddPairWindow`: Cửa sổ thêm mã tiền tệ.
+    * `ChartWindow`: Cửa sổ nhúng thư viện `matplotlib` để render biểu đồ Line Chart trực quan.
 
----
+### 2.3. Lớp Controller (`controllers/`)
+* **Vai trò:** Cầu nối trung gian. Lắng nghe các sự kiện (Events) từ View, gọi Model để xử lý, và trả dữ liệu về View để cập nhật lên màn hình.
+* **Component chính:** `AppController` (`app_controller.py`)
+  * Khởi tạo Model và View.
+  * Cung cấp các hàm handler (ví dụ: `add_pair`, `remove_pair`) mà View sẽ gọi khi người dùng bấm nút.
 
-## 5. Luồng dữ liệu (Data Flow) - Ví dụ: Sửa sinh viên
-1. **View (gui_view.py)**: Người dùng chọn 1 hàng trong bảng, nhập thông tin mới và bấm "Cập nhật". Gửi thông tin (Mã cũ, Dữ liệu mới) đến Controller.
-2. **Controller (gui_controller.py)**: Nhận yêu cầu, gọi hàm `models.diemdanh.sua_sinh_vien(df, old_msv, new_data)`.
-3. **Model (diemdanh.py)**: Tìm vị trí (Index) sinh viên trong Pandas DataFrame. Kiểm tra điều kiện trùng mã SV. Nếu thoả mãn, tiến hành gán đè dữ liệu mới. Sau đó lưu lại file `diemdanh.csv`.
-4. **Model -> Controller**: Trả về một Tuple (DataFrame_mới, Trạng_thái_Boolean, Thông_báo).
-5. **Controller -> View**: Controller thông báo thành công. View sẽ nhận DataFrame mới, xoá toàn bộ hiển thị cũ, sau đó render lại bảng UI.
+### 2.4. Lớp Service (`services/`)
+* **Vai trò:** Xử lý các tác vụ ngoại vi, đặc biệt là các tác vụ mạng/bất đồng bộ (Asynchronous) để không làm treo giao diện.
+* **Component chính:** `APIService` (`api_service.py`)
+  * Chạy trên một luồng phụ (`threading.Thread`).
+  * Liên tục thực hiện HTTP GET Request tới ExchangeRate-API mỗi 30 giây.
+  * Gọi callback (`view.after()`) để báo hiệu Controller cập nhật View an toàn từ luồng chính.
+
+## 3. Sơ đồ Luồng Dữ liệu (Data Flow)
+1. **Background Update:** `APIService` (Thread 2) gọi API lấy JSON -> Gửi dữ liệu tỷ giá mới -> `AppController` -> Lưu vào `Model` (SQLite).
+2. **GUI Refresh:** `APIService` gọi callback -> `AppController` lấy dữ liệu thống kê từ `Model` (qua `pandas`) -> Cập nhật lên `Treeview` và `Label` ở `View`.
+3. **User Action (Ví dụ: Mở biểu đồ):** Người dùng chọn cặp tiền và bấm nút ở `View` -> Mở `ChartWindow` -> Lấy `DataFrame` lịch sử từ `Model` -> Render đồ thị `matplotlib`.

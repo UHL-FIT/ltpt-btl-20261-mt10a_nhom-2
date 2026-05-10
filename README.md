@@ -1,89 +1,52 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/-QmD8cHQ)
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=23869451&assignment_repo_type=AssignmentRepo)
-# SmartAttend - Phần Mềm Quản Lý Điểm Danh Sinh Viên
 
-SmartAttend là một ứng dụng Python chuyên dụng giúp giảng viên/người dùng quản lý thông tin sinh viên, điểm danh theo tuần, theo dõi số lần nộp bài tập, vi phạm và đưa ra các cảnh báo cấm thi một cách trực quan, hiện đại.
+# Real-time Currency Tracker Pro 💱
 
-> **Lưu ý quan trọng**: Đây là dự án ví dụ cốt lõi (baseline) dành cho sinh viên tham khảo trong quá trình phát triển và hoàn thiện Bài tập lớn môn Lập trình Python. Mọi tính năng cơ bản của một ứng dụng quản lý đều được triển khai theo đúng chuẩn.
-## Tính năng nổi bật
-1. **Giao diện 2 trong 1**: Hỗ trợ cả giao diện đồ hoạ (GUI) trực quan thân thiện và giao diện dòng lệnh (CLI) nhẹ nhàng.
-2. **Quản lý Sinh viên**: Thêm, Sửa, Xoá, và Tìm kiếm linh hoạt với bộ lọc (Tất cả, MSV, Họ tên, Giới tính, SĐT).
-3. **Điểm danh Nhanh**: Tự động tính toán điểm chuyên cần theo từng lần điểm danh:
-   - `M`: Có mặt
-   - `P`: Vắng có phép (🟢)
-   - `K`: Vắng không phép (🟥) - Bị trừ điểm.
-4. **Cảnh báo Tự động**: Tự động dán nhãn màu "Cẩn thận cấm thi" (Cam) và "Cấm thi" (Đỏ) dựa trên số buổi vắng.
-5. **Import/Export Dữ liệu**: Hỗ trợ nhập và xuất hàng loạt dữ liệu thông qua file `.csv`.
+Ứng dụng Desktop quản lý tỷ giá tiền tệ theo thời gian thực được xây dựng bằng Python và CustomTkinter. Phần mềm áp dụng chuẩn mô hình MVC (Model-View-Controller) giúp dễ dàng bảo trì và mở rộng.
 
-## Cấu trúc Dự án
+## ✨ Tính năng nổi bật
+1. **Theo dõi tỷ giá thời gian thực**: Lấy dữ liệu tỷ giá tự động từ ExchangeRate-API chạy ngầm mỗi 30 giây mà không làm đơ ứng dụng.
+2. **Giao diện hiện đại (Dark Mode)**: Sử dụng CustomTkinter cung cấp trải nghiệm mượt mà, tối màu hiện đại với bảng dữ liệu hiển thị trực quan.
+3. **Thống kê chuyên sâu**: Tự động tính toán các chỉ số thống kê tài chính như Tỷ giá trung bình (Avg), Thấp nhất (Min), Cao nhất (Max) và Độ biến động (Volatility) nhờ sức mạnh của thư viện `pandas`.
+4. **Biểu đồ trực quan**: Vẽ đồ thị biến động tỷ giá theo thời gian thực (Line chart) thông qua thư viện `matplotlib`.
+5. **Quản lý dữ liệu linh hoạt**: Lưu trữ lịch sử vĩnh viễn trên cơ sở dữ liệu `SQLite` và hỗ trợ xuất dữ liệu ra file `.csv` chỉ với một cú click.
+
+## 📂 Cấu trúc Dự án (MVC Architecture)
 ```
-ltpt_example/
-├── assets/                  # Icon và tài nguyên ảnh
-├── controllers/             # Chứa logic điều khiển (gui_controller.py, cli_controller.py)
-├── data/                    # Nơi lưu trữ database (diemdanh.csv)
-├── models/                  # Chứa logic tính toán và xử lý dữ liệu (diemdanh.py)
-├── templates/               # Form mẫu CSV (diemdanh_template.csv) để import
-├── utils/                   # Các tiện ích (Logger)
-├── views/                   # Giao diện người dùng (gui_view.py, cli_view.py)
-├── main.py                  # File khởi chạy ứng dụng chính
-├── requirements.txt         # Khai báo các thư viện Python phụ thuộc cần cài đặt
-├── README.md                # Tài liệu hướng dẫn chính, tổng quan về dự án
-├── CONVENTIONS.md           # Tài liệu quy chuẩn viết code, commit và cấu trúc nhánh
-├── SRS.md                   # Tài liệu Đặc tả Yêu cầu Hệ thống (Software Requirements Specification)
-├── SAD.md                   # Tài liệu Thiết kế Kiến trúc Phần mềm (Software Architecture Document)
-├── build.bat                # Script tự động đóng gói ứng dụng Python thành file thực thi (.exe)
-├── clean.bat                # Script tự động dọn dẹp môi trường, xóa file rác, file tạm sau khi build
-├── run_tests.bat            # Script tự động chạy toàn bộ các Unit Test của ứng dụng
-└── setup_env.bat            # Script tự động tạo môi trường ảo (.venv) và cài đặt các thư viện cần thiết
+currency_tracker_pro/
+├── controllers/             # Logic điều hướng và trung gian (app_controller.py)
+├── models/                  # Quản lý Database SQLite và thao tác Pandas (database.py)
+├── services/                # Background Worker xử lý gọi API (api_service.py)
+├── views/                   # Giao diện chính và các cửa sổ phụ (main_gui.py, components.py)
+├── main.py                  # Entry point (Khởi chạy ứng dụng)
+├── requirements.txt         # Khai báo các thư viện Python
+├── README.md                # Tài liệu dự án (bạn đang đọc)
+├── SRS.md                   # Đặc tả Yêu cầu Hệ thống
+└── SAD.md                   # Thiết kế Kiến trúc Phần mềm
 ```
 
-## Hướng dẫn cài đặt và sử dụng dành cho Developer
-
-### Thứ tự chạy các file Script (.bat)
-Để hệ thống hoạt động trơn tru từ khi clone về máy, hãy chạy theo thứ tự sau:
-1. Chạy **`setup_env.bat`**: Để tạo môi trường và tải thư viện.
-2. Chạy **`main.py`** (thông qua lệnh python): Để chạy ứng dụng chính.
-3. Chạy **`run_tests.bat`** (Tuỳ chọn): Để kiểm tra xem code có vượt qua các test cases không.
-4. Chạy **`build.bat`** (Tuỳ chọn): Để xuất ra file `.exe` đem đi phân phối cho người dùng khác.
-5. Chạy **`clean.bat`** (Tuỳ chọn): Dọn dẹp không gian đĩa nếu không cần thư mục build/dist nữa.
+## 🛠 Hướng dẫn cài đặt và sử dụng
 
 ### 1. Khởi tạo môi trường
-Bạn chỉ cần nhấp đúp chuột vào file `setup_env.bat` (trên Windows). 
-Script này sẽ tự động:
-- Tạo một môi trường ảo có tên là `.venv`.
-- Kích hoạt môi trường ảo.
-- Cài đặt toàn bộ thư viện cần thiết từ `requirements.txt` (như `pandas`, `numpy`, `pyinstaller`).
+Dự án cung cấp sẵn file `setup_env.bat` (dành cho Windows). Nhấp đúp chuột để tự động tạo môi trường ảo `.venv` và tải tất cả các thư viện cần thiết.
+Hoặc cài đặt thủ công bằng lệnh:
+```bash
+pip install -r requirements.txt
+```
 
 ### 2. Chạy ứng dụng
-Sau khi đã thiết lập môi trường, bạn có thể chạy phần mềm bằng lệnh:
-
-**Chạy với Giao diện Đồ họa (GUI - Mặc định)**
+Mở Terminal tại thư mục gốc của dự án và chạy:
 ```bash
-.venv\Scripts\activate
 python main.py
 ```
 
-**Chạy với Giao diện Dòng lệnh (CLI - Terminal)**
-Nếu bạn muốn sử dụng phần mềm trực tiếp trên môi trường dòng lệnh siêu nhẹ, hãy truyền thêm tham số `--cli`:
-```bash
-.venv\Scripts\activate
-python main.py --cli
-```
-
 ### 3. Đóng gói ra File Thực thi (.exe)
-Để phân phối cho người dùng cuối (không cần cài đặt Python), hãy click đúp chuột vào file `build.bat`. 
-Hệ thống sẽ dùng `PyInstaller` để biên dịch toàn bộ source code thành file `Setup_SmartAttend.exe` (Nếu bạn dùng thêm Inno Setup) hoặc bộ chạy độc lập trong thư mục `dist/`.
+Bạn có thể chạy script `build.bat` để sử dụng `PyInstaller` biên dịch ứng dụng thành file `.exe` hoạt động độc lập (nếu có yêu cầu).
 
-### 4. Dọn dẹp
-Để lấy lại dung lượng bộ nhớ, bạn có thể chạy `clean.bat`. File này sẽ xóa các thư mục `build`, `dist` và các file cache của Python.
+## 👥 Nhóm phát triển (Nhóm 2)
+* **Trần Trung Hiếu** - Xây dựng kiến trúc MVC, thiết kế cơ sở dữ liệu, phát triển giao diện GUI.
+* *(Ghi chú: Nếu nhóm có thêm thành viên, hãy bổ sung tên và MSSV tại đây)*
 
-### 5. Cập nhật thư viện (Dependencies)
-Trong quá trình phát triển, nếu bạn cài đặt thêm các thư viện mới, hãy chạy lệnh sau trong terminal (đã kích hoạt môi trường ảo `.venv`) để cập nhật lại file `requirements.txt`:
-```bash
-pip freeze > requirements.txt
-```
-
-## Tác giả / Contributors
-* **VŨ DUY SƠN**
-* Chức vụ: Giảng viên UHL (Trường Đại học Hạ Long)
-* Email: vuduyson@daihochalong.edu.vn / sonduyvu@gmail.com
+---
+*Dự án Bài tập lớn - Môn Lập trình Python.*
