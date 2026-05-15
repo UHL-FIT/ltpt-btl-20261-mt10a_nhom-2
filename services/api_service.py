@@ -51,9 +51,10 @@ class APIService:
             except Exception as e:
                 print(f"Lỗi trong vòng lặp cập nhật: {e}")
                 
-            # Đợi 30 giây trước khi cập nhật tiếp
-            # Sử dụng vòng lặp nhỏ để có thể dừng thread nhanh hơn
-            for _ in range(30):
+            # Đợi 3600 giây (1 giờ) trước khi cập nhật tiếp
+            # API miễn phí chỉ cập nhật 1 lần/ngày, không cần gọi thường xuyên
+            # Dùng vòng lặp nhỏ để có thể dừng thread nhanh khi tắt app
+            for _ in range(3600):
                 if not self.is_running:
                     break
                 time.sleep(1)

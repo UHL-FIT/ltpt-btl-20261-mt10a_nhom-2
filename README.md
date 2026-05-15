@@ -46,7 +46,7 @@ Bạn có thể chạy script `build.bat` để sử dụng `PyInstaller` biên 
 
 ## 👥 Nhóm phát triển (Nhóm 2)
 * **Trần Trung Hiếu** - Xây dựng kiến trúc MVC, thiết kế cơ sở dữ liệu, phát triển giao diện GUI.
-* *(Ghi chú: Nếu nhóm có thêm thành viên, hãy bổ sung tên và MSSV tại đây)*
+
 
 ---
 *Dự án Bài tập lớn - Môn Lập trình Python.*
