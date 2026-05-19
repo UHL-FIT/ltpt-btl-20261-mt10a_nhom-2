@@ -1,15 +1,15 @@
 [Setup]
 ; Thông tin chung về ứng dụng
-AppName=SmartAttend
+AppName=Real-time Currency Tracker Pro
 AppVersion=1.0
-AppPublisher=Khoa CNTT
-AppPublisherURL=https://example.com/
-AppSupportURL=https://example.com/
-AppUpdatesURL=https://example.com/
-DefaultDirName={autopf}\SmartAttend
+AppPublisher=Nhom 2
+AppPublisherURL=https://github.com/
+AppSupportURL=https://github.com/
+AppUpdatesURL=https://github.com/
+DefaultDirName={autopf}\CurrencyTrackerPro
 DisableProgramGroupPage=yes
 ; Tên file cài đặt đầu ra
-OutputBaseFilename=Setup_SmartAttend
+OutputBaseFilename=Setup_CurrencyTrackerPro
 ; Thêm icon cho file Setup
 SetupIconFile=assets\app_icon.ico
 ; Thư mục lưu file cài đặt (để vào thư mục dist)
@@ -25,18 +25,18 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-; Thư mục bản GUI
-Source: "dist\SmartAttend\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; Thư mục bản CLI (ghi đè các thư viện trùng lặp vào cùng bộ cài)
-Source: "dist\SmartAttend_CLI\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Sao chép tệp thực thi chính (được build từ PyInstaller là main.exe, đổi tên thành CurrencyTrackerPro.exe khi cài đặt)
+Source: "dist\main.exe"; DestDir: "{app}"; DestName: "CurrencyTrackerPro.exe"; Flags: ignoreversion
+; Sao chép tài liệu hướng dẫn sử dụng
+Source: "guide.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "guide.pdf"; DestDir: "{app}"; Flags: ignoreversion; Check: FileExists('guide.pdf')
 
 [Icons]
-; Tạo shortcut ở Start Menu cho cả GUI và CLI
-Name: "{autoprograms}\SmartAttend"; Filename: "{app}\SmartAttend.exe"
-Name: "{autoprograms}\SmartAttend (CLI)"; Filename: "{app}\SmartAttend_CLI.exe"
-; Tạo shortcut ở Desktop cho bản GUI nếu user tick chọn
-Name: "{autodesktop}\SmartAttend"; Filename: "{app}\SmartAttend.exe"; Tasks: desktopicon
+; Tạo shortcut ở Start Menu
+Name: "{autoprograms}\Real-time Currency Tracker Pro"; Filename: "{app}\CurrencyTrackerPro.exe"
+; Tạo shortcut ở Desktop nếu người dùng chọn
+Name: "{autodesktop}\Real-time Currency Tracker Pro"; Filename: "{app}\CurrencyTrackerPro.exe"; Tasks: desktopicon
 
 [Run]
-; Chạy ứng dụng sau khi cài đặt xong
-Filename: "{app}\SmartAttend.exe"; Description: "{cm:LaunchProgram,SmartAttend}"; Flags: nowait postinstall skipifsilent
+; Cho phép chạy ứng dụng ngay sau khi cài đặt xong
+Filename: "{app}\CurrencyTrackerPro.exe"; Description: "{cm:LaunchProgram,Real-time Currency Tracker Pro}"; Flags: nowait postinstall skipifsilent

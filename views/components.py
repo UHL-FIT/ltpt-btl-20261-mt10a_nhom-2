@@ -9,25 +9,49 @@ import os
 import sys
 import subprocess
 
-# Danh sách ~170 mã ISO tiền tệ phổ biến nhúng cứng
-ISO_CURRENCIES = [
-    "AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN",
-    "BAM","BBD","BDT","BGN","BHD","BIF","BMD","BND","BOB","BRL",
-    "BSD","BTN","BWP","BYR","BZD","CAD","CDF","CHF","CLP","CNY",
-    "COP","CRC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP",
-    "ERN","ETB","EUR","FJD","FKP","GBP","GEL","GHS","GIP","GMD",
-    "GNF","GTQ","GYD","HKD","HNL","HRK","HTG","HUF","IDR","ILS",
-    "INR","IQD","IRR","ISK","JMD","JOD","JPY","KES","KGS","KHR",
-    "KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD",
-    "LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRO",
-    "MUR","MVR","MWK","MXN","MYR","MZN","NAD","NGN","NIO","NOK",
-    "NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG",
-    "QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK",
-    "SGD","SHP","SLL","SOS","SRD","STD","SVC","SYP","SZL","THB",
-    "TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX",
-    "USD","UYU","UZS","VEF","VND","VUV","WST","XAF","XCD","XOF",
-    "XPF","YER","ZAR","ZMW","ZWL"
-]
+# Danh sách mã ISO tiền tệ và tên quốc gia/khu vực tương ứng
+CURRENCIES = {
+    "AED": "Các Tiểu vương quốc Ả Rập Thống nhất (Dirham)", "AFN": "Afghanistan (Afghani)", "ALL": "Albania (Lek)",
+    "AMD": "Armenia (Dram)", "ANG": "Curaçao và Sint Maarten (Guilder)", "AOA": "Angola (Kwanza)",
+    "ARS": "Argentina (Peso)", "AUD": "Đô la Úc", "AWG": "Aruba (Florin)", "AZN": "Azerbaijan (Manat)",
+    "BAM": "Bosnia và Herzegovina (Mark)", "BBD": "Barbados (Đô la)", "BDT": "Bangladesh (Taka)",
+    "BGN": "Bulgaria (Lev)", "BHD": "Bahrain (Dinar)", "BIF": "Burundi (Franc)", "BMD": "Bermuda (Đô la)",
+    "BND": "Brunei (Đô la)", "BOB": "Bolivia (Boliviano)", "BRL": "Brazil (Real)", "BSD": "Bahamas (Đô la)",
+    "BTN": "Bhutan (Ngultrum)", "BWP": "Botswana (Pula)", "BYR": "Belarus (Rúp)", "BZD": "Belize (Đô la)",
+    "CAD": "Đô la Canada", "CDF": "Congo (Franc)", "CHF": "Franc Thụy Sĩ", "CLP": "Chile (Peso)",
+    "CNY": "Nhân dân tệ (Trung Quốc)", "COP": "Colombia (Peso)", "CRC": "Costa Rica (Colon)", "CUP": "Cuba (Peso)",
+    "CVE": "Cape Verde (Escudo)", "CZK": "Cộng hòa Séc (Koruna)", "DJF": "Djibouti (Franc)", "DKK": "Đan Mạch (Krone)",
+    "DOP": "Cộng hòa Dominica (Peso)", "DZD": "Algeria (Dinar)", "EGP": "Ai Cập (Bảng)", "ERN": "Eritrea (Nakfa)",
+    "ETB": "Ethiopia (Birr)", "EUR": "Euro", "FJD": "Fiji (Đô la)", "FKP": "Quần đảo Falkland (Bảng)",
+    "GBP": "Bảng Anh", "GEL": "Georgia (Lari)", "GHS": "Ghana (Cedi)", "GIP": "Gibraltar (Bảng)",
+    "GMD": "Gambia (Dalasi)", "GNF": "Guinea (Franc)", "GTQ": "Guatemala (Quetzal)", "GYD": "Guyana (Đô la)",
+    "HKD": "Đô la Hồng Kông", "HNL": "Honduras (Lempira)", "HRK": "Croatia (Kuna)", "HTG": "Haiti (Gourde)",
+    "HUF": "Hungary (Forint)", "IDR": "Rupiah Indonesia", "ILS": "Israel (Shekel)", "INR": "Rupee Ấn Độ",
+    "IQD": "Iraq (Dinar)", "IRR": "Iran (Rial)", "ISK": "Iceland (Krona)", "JMD": "Jamaica (Đô la)",
+    "JOD": "Jordan (Dinar)", "JPY": "Yên Nhật", "KES": "Kenya (Shilling)", "KGS": "Kyrgyzstan (Som)",
+    "KHR": "Campuchia (Riel)", "KMF": "Comoros (Franc)", "KPW": "Triều Tiên (Won)", "KRW": "Won Hàn Quốc",
+    "KWD": "Kuwait (Dinar)", "KYD": "Quần đảo Cayman (Đô la)", "KZT": "Kazakhstan (Tenge)", "LAK": "Lào (Kip)",
+    "LBP": "Li-băng (Bảng)", "LKR": "Sri Lanka (Rupee)", "LRD": "Liberia (Đô la)", "LSL": "Lesotho (Loti)",
+    "LYD": "Libya (Dinar)", "MAD": "Ma-rốc (Dirham)", "MDL": "Moldova (Leu)", "MGA": "Madagascar (Ariary)",
+    "MKD": "Bắc Macedonia (Denar)", "MMK": "Myanmar (Kyat)", "MNT": "Mông Cổ (Tugrik)", "MOP": "Ma Cao (Pataca)",
+    "MRO": "Mauritania (Ouguiya)", "MUR": "Mauritius (Rupee)", "MVR": "Maldives (Rufiyaa)", "MWK": "Malawi (Kwacha)",
+    "MXN": "Mexico (Peso)", "MYR": "Malaysia (Ringgit)", "MZN": "Mozambique (Metical)", "NAD": "Namibia (Đô la)",
+    "NGN": "Nigeria (Naira)", "NIO": "Nicaragua (Cordoba)", "NOK": "Na Uy (Krone)", "NPR": "Nepal (Rupee)",
+    "NZD": "Đô la New Zealand", "OMR": "Oman (Rial)", "PAB": "Panama (Balboa)", "PEN": "Peru (Sol)",
+    "PGK": "Papua New Guinea (Kina)", "PHP": "Philippines (Peso)", "PKR": "Pakistan (Rupee)", "PLN": "Ba Lan (Zloty)",
+    "PYG": "Paraguay (Guarani)", "QAR": "Qatar (Riyal)", "RON": "Romania (Leu)", "RSD": "Serbia (Dinar)",
+    "RUB": "Rúp Nga", "RWF": "Rwanda (Franc)", "SAR": "Ả Rập Xê-út (Riyal)", "SBD": "Quần đảo Solomon (Đô la)",
+    "SCR": "Seychelles (Rupee)", "SDG": "Sudan (Bảng)", "SEK": "Thụy Điển (Krona)", "SGD": "Đô la Singapore",
+    "SHP": "Saint Helena (Bảng)", "SLL": "Sierra Leone (Leone)", "SOS": "Somalia (Shilling)", "SRD": "Suriname (Đô la)",
+    "STD": "São Tomé và Príncipe (Dobra)", "SVC": "El Salvador (Colon)", "SYP": "Syria (Bảng)", "SZL": "Eswatini (Lilangeni)",
+    "THB": "Baht Thái", "TJS": "Tajikistan (Somoni)", "TMT": "Turkmenistan (Manat)", "TND": "Tunisia (Dinar)",
+    "TOP": "Tonga (Paʻanga)", "TRY": "Thổ Nhĩ Kỳ (Lira)", "TTD": "Trinidad và Tobago (Đô la)", "TWD": "Tân Đài Tệ",
+    "TZS": "Tanzania (Shilling)", "UAH": "Ukraine (Hryvnia)", "UGX": "Uganda (Shilling)", "USD": "Đô la Mỹ",
+    "UYU": "Uruguay (Peso)", "UZS": "Uzbekistan (Som)", "VEF": "Venezuela (Bolívar)", "VND": "Việt Nam Đồng",
+    "VUV": "Vanuatu (Vatu)", "WST": "Samoa (Tala)", "XAF": "CFA Franc BEAC", "XCD": "Đô la Đông Caribbean",
+    "XOF": "CFA Franc BCEAO", "XPF": "CFP Franc", "YER": "Yemen (Rial)", "ZAR": "Nam Phi (Rand)",
+    "ZMW": "Zambia (Kwacha)", "ZWL": "Zimbabwe (Đô la)"
+}
 
 class SplashScreen(ctk.CTkToplevel):
     """Màn hình chờ khi khởi động ứng dụng."""
@@ -84,7 +108,13 @@ class AutocompleteEntry(ctk.CTkFrame):
             self._hide_dropdown()
             return
 
-        matches = [c for c in ISO_CURRENCIES if c.startswith(typed)][:8]
+        matches = []
+        for code, name in CURRENCIES.items():
+            if typed in code or typed in name.upper():
+                matches.append(f"{code} - {name}")
+            if len(matches) >= 8:
+                break
+
         if matches:
             self._show_dropdown(matches)
         else:
@@ -106,7 +136,7 @@ class AutocompleteEntry(ctk.CTkFrame):
         self.update_idletasks()
         x = self.entry.winfo_rootx()
         y = self.entry.winfo_rooty() + self.entry.winfo_height() + 2
-        w = max(self.entry.winfo_width(), 200)
+        w = max(self.entry.winfo_width(), 350)
         h = len(matches) * 28
 
         self._dropdown.geometry(f"{w}x{h}+{x}+{y}")
@@ -144,13 +174,14 @@ class AutocompleteEntry(ctk.CTkFrame):
             self._listbox.selection_set(0)
 
     def _on_select(self, event):
-        """Điền mã được chọn vào ô nhập và đóng dropdown."""
+        """Điền mã được chọn kèm tên quốc gia/khu vực vào ô nhập và đóng dropdown."""
         if not self._listbox:
             return
         sel = self._listbox.curselection()
         if sel:
+            selected_text = self._listbox.get(sel[0])
             self.entry.delete(0, tk.END)
-            self.entry.insert(0, self._listbox.get(sel[0]))
+            self.entry.insert(0, selected_text)
         self._hide_dropdown()
         self.entry.focus_set()
 
@@ -159,11 +190,20 @@ class AutocompleteEntry(ctk.CTkFrame):
         self.after(200, self._hide_dropdown)
 
     def get(self):
-        return self.entry.get().strip()
+        """Lấy 3 ký tự mã ISO từ ô nhập (tách bỏ phần tên nước/khu vực nếu có)."""
+        val = self.entry.get().strip()
+        if " - " in val:
+            return val.split(" - ")[0].strip().upper()
+        return val.upper()
 
     def set(self, value):
+        """Đặt giá trị ô nhập (tự động kèm tên nước/khu vực gợi ý nếu có trong danh sách)."""
         self.entry.delete(0, tk.END)
-        self.entry.insert(0, value)
+        code = value.strip().upper()
+        if code in CURRENCIES:
+            self.entry.insert(0, f"{code} - {CURRENCIES[code]}")
+        else:
+            self.entry.insert(0, code)
 
 
 class AddPairWindow(ctk.CTkToplevel):
@@ -343,11 +383,15 @@ class AboutWindow(ctk.CTkToplevel):
                       fg_color="gray40", hover_color="gray30").pack(pady=5)
 
     def open_guide(self):
-        """Mở file hướng dẫn sử dụng."""
-        guide_path = os.path.join(os.getcwd(), "guide.txt")
+        """Mở file hướng dẫn sử dụng (ưu tiên PDF, fallback TXT)."""
+        guide_path = os.path.join(os.getcwd(), "guide.pdf")
+        if not os.path.exists(guide_path):
+            # Fallback sang guide.txt nếu không có PDF
+            guide_path = os.path.join(os.getcwd(), "guide.txt")
+            
         if not os.path.exists(guide_path):
             messagebox.showwarning("Không tìm thấy file",
-                                   f"Không tìm thấy file hướng dẫn tại:\n{guide_path}", parent=self)
+                                   "Không tìm thấy file hướng dẫn sử dụng (guide.pdf hoặc guide.txt)!", parent=self)
             return
         try:
             if sys.platform == "win32":

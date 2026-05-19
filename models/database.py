@@ -169,11 +169,23 @@ class Database:
             return False, str(e)
             
     def import_from_csv(self, file_path):
-        """Nhập danh sách các cặp tiền từ file CSV (cột base, target)."""
+        """Nhập danh sách các cặp tiền từ file CSV (cột base/base_currency, target/target_currency)."""
         try:
             df = pd.read_csv(file_path)
+            
+            # Chuẩn hóa tên cột để hỗ trợ cả 'base'/'base_currency' và 'target'/'target_currency'
+            col_mapping = {}
+            for col in df.columns:
+                col_lower = col.lower().strip()
+                if col_lower in ['base', 'base_currency']:
+                    col_mapping[col] = 'base'
+                elif col_lower in ['target', 'target_currency']:
+                    col_mapping[col] = 'target'
+            
+            df = df.rename(columns=col_mapping)
+            
             if 'base' not in df.columns or 'target' not in df.columns:
-                return False, "File CSV phải có cột 'base' và 'target'."
+                return False, "File CSV phải có cột 'base' (hoặc 'base_currency') và 'target' (hoặc 'target_currency')."
             
             success_count = 0
             for _, row in df.iterrows():

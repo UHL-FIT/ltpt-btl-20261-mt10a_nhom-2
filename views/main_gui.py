@@ -39,8 +39,9 @@ class MainWindow(ctk.CTk):
             ("✏️  Sửa cặp đã chọn", "#007bff", "#0056b3", self.open_edit_window,   2),
             ("🗑️  Xóa cặp đã chọn", "#dc3545", "#c82333", self.remove_selected,    3),
             ("📈  Xem biểu đồ",     "#6f42c1", "#59359a", self.open_chart_window,  4),
-            ("📤  Xuất CSV",         "#17a2b8", "#138496", self.export_csv,         5),
-            ("ℹ️  About",            "#6c757d", "#5a6268", self.open_about_window,  6),
+            ("📥  Nhập CSV",         "#fd7e14", "#e8590c", self.import_csv,         5),
+            ("📤  Xuất CSV",         "#17a2b8", "#138496", self.export_csv,         6),
+            ("ℹ️  About",            "#6c757d", "#5a6268", self.open_about_window,  7),
         ]
 
         for text, color, hover, cmd, row in buttons:
@@ -50,10 +51,10 @@ class MainWindow(ctk.CTk):
 
         # Đổi theme
         ctk.CTkLabel(self.sidebar, text="Giao diện:", anchor="w").grid(
-            row=9, column=0, padx=20, pady=(10, 0))
+            row=10, column=0, padx=20, pady=(10, 0))
         ctk.CTkOptionMenu(self.sidebar, values=["Dark", "Light", "System"],
                           command=lambda m: ctk.set_appearance_mode(m)).grid(
-            row=10, column=0, padx=20, pady=(5, 20))
+            row=11, column=0, padx=20, pady=(5, 20))
 
     # ─────────────────────── MAIN CONTENT ───────────────────────
     def _create_main_content(self):
@@ -61,7 +62,7 @@ class MainWindow(ctk.CTk):
         self.main_frame = ctk.CTkFrame(self, corner_radius=10)
         self.main_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
         self.main_frame.grid_columnconfigure(0, weight=1)
-        self.main_frame.grid_rowconfigure(2, weight=1)  # Bảng dữ liệu co giãn
+        self.main_frame.grid_rowconfigure(3, weight=1)  # Bảng dữ liệu co giãn
 
         # Tiêu đề
         ctk.CTkLabel(self.main_frame, text="Bảng Tỷ Giá Trực Tuyến",
@@ -71,11 +72,39 @@ class MainWindow(ctk.CTk):
         # Stat cards
         self._create_stat_cards()
 
-        # Bảng dữ liệu (Treeview)
+        # Thanh tìm kiếm (Row 2)
+        self._create_search_bar()
+
+        # Bảng dữ liệu (Treeview - Row 3)
         self._create_treeview()
 
-        # Mini Calculator
+        # Mini Calculator (Row 4)
         self._create_mini_calculator()
+
+    def _create_search_bar(self):
+        """Tạo thanh tìm kiếm dữ liệu trên bảng."""
+        search_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        search_frame.grid(row=2, column=0, padx=20, pady=(0, 10), sticky="ew")
+        search_frame.grid_columnconfigure(1, weight=1)
+
+        ctk.CTkLabel(search_frame, text="🔍 Tìm kiếm:",
+                     font=ctk.CTkFont(size=12, weight="bold")).grid(row=0, column=0, padx=(0, 10), sticky="w")
+
+        self.search_var = ctk.StringVar()
+        self.search_var.trace_add("write", self._on_search_change)
+        
+        self.search_entry = ctk.CTkEntry(search_frame, textvariable=self.search_var,
+                                         placeholder_text="Nhập mã tiền tệ để lọc (VD: USD/VND hoặc EUR)...")
+        self.search_entry.grid(row=0, column=1, sticky="ew")
+        
+        # Nút xóa trắng ô tìm kiếm
+        ctk.CTkButton(search_frame, text="Xóa", width=60, 
+                      command=lambda: self.search_var.set(""),
+                      fg_color="gray40", hover_color="gray30").grid(row=0, column=2, padx=(10, 0))
+
+    def _on_search_change(self, *args):
+        """Kích hoạt khi nội dung tìm kiếm thay đổi."""
+        self._render_table(self._all_stats)
 
     def _create_stat_cards(self):
         """Tạo 4 thẻ thống kê tổng quan."""
@@ -99,7 +128,7 @@ class MainWindow(ctk.CTk):
     def _create_treeview(self):
         """Tạo bảng hiển thị dữ liệu tỷ giá."""
         tree_frame = ctk.CTkFrame(self.main_frame)
-        tree_frame.grid(row=2, column=0, padx=20, pady=(0, 10), sticky="nsew")
+        tree_frame.grid(row=3, column=0, padx=20, pady=(0, 10), sticky="nsew")
         tree_frame.grid_rowconfigure(0, weight=1)
         tree_frame.grid_columnconfigure(0, weight=1)
 
@@ -136,7 +165,7 @@ class MainWindow(ctk.CTk):
         """Tạo ô tính nhanh quy đổi tiền tệ."""
         calc_frame = ctk.CTkFrame(self.main_frame, corner_radius=8,
                                   fg_color=("gray85", "gray18"))
-        calc_frame.grid(row=3, column=0, padx=20, pady=(0, 20), sticky="ew")
+        calc_frame.grid(row=4, column=0, padx=20, pady=(0, 20), sticky="ew")
         calc_frame.grid_columnconfigure(1, weight=1)
 
         ctk.CTkLabel(calc_frame, text="🧮 Quy đổi nhanh:",
@@ -219,6 +248,19 @@ class MainWindow(ctk.CTk):
         else:
             messagebox.showerror("Lỗi", msg)
 
+    def import_csv(self):
+        """Nhập dữ liệu từ CSV."""
+        path = filedialog.askopenfilename(
+            defaultextension=".csv", filetypes=[("CSV files", "*.csv")],
+            title="Mở file CSV")
+        if not path:
+            return
+        success, msg = self.controller.import_data(path)
+        if success:
+            messagebox.showinfo("Thành công", msg)
+        else:
+            messagebox.showerror("Lỗi", msg)
+
     def open_about_window(self):
         AboutWindow(self)
 
@@ -255,7 +297,10 @@ class MainWindow(ctk.CTk):
         """Vẽ lại bảng từ dictionary stats được truyền vào."""
         for item in self.tree.get_children():
             self.tree.delete(item)
+        query = self.search_var.get().strip().upper() if hasattr(self, 'search_var') else ""
         for pair_name, stat in stats.items():
+            if query and query not in pair_name.upper():
+                continue
             self.tree.insert("", "end", values=(
                 pair_name,
                 f"{stat['current_rate']:.4f}",
